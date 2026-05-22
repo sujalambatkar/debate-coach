@@ -16,13 +16,6 @@ Paste any text — an article, speech, tweet, or claim — and DebateCoach tears
 - **Argument Tracker** — live feed of your key claims vs. AI counter-arguments extracted each turn
 - **Debate Scoring** — impartial judge scores both sides on logic, evidence, and rhetoric with actionable improvement tips
 
----
-
-## Screenshots
-
-> Drop screenshots here after your first run.
-
----
 
 ## Tech Stack
 
