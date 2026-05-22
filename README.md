@@ -1,19 +1,26 @@
 # DebateCoach — AI Argument Analyzer & Debate Arena
 
-Dissect any argument. Win any debate. Powered by Google Gemini 2.0 Flash.
+> Dissect any argument. Expose fallacies. Win any debate. Powered by Llama 3.3 70B via Groq.
 
-> **Screenshots placeholder** — run the app and paste a screenshot here.
+**[Live Demo](https://debate-coach-one.vercel.app)**
 
 ---
 
-## Features
+## What it does
 
-- **Argument Analysis** — paste any text and get a full breakdown: main claim, premises, conclusion, logical fallacies, strong points, weak points, and an argument strength score (1–10)
-- **Fact Checking** — verify the main claim and premises against AI knowledge
-- **Live Debate Arena** — debate the AI in real-time with streaming responses; the AI takes the opposite side and challenges every weak argument
-- **Argument Tracker** — live list of your key points and AI counter-arguments extracted per turn
+Paste any text — an article, speech, tweet, or claim — and DebateCoach tears it apart:
+
+- **Argument Analysis** — extracts the main claim, premises, and conclusion; scores argument strength 1–10; identifies logical fallacies with exact quotes; lists strong and weak points
+- **Fact Checking** — verifies the main claim and each premise against the AI's knowledge with a verdict (true / false / disputed / unverifiable)
+- **Live Debate Arena** — choose your side and debate the AI in real time; it takes the opposite position and challenges every weak argument with streaming responses
+- **Argument Tracker** — live feed of your key claims vs. AI counter-arguments extracted each turn
 - **Debate Scoring** — impartial judge scores both sides on logic, evidence, and rhetoric with actionable improvement tips
-- **Dark UI** — polished dark theme with framer-motion animations throughout
+
+---
+
+## Screenshots
+
+> Drop screenshots here after your first run.
 
 ---
 
@@ -21,69 +28,45 @@ Dissect any argument. Win any debate. Powered by Google Gemini 2.0 Flash.
 
 | Layer | Technology |
 |---|---|
-| Frontend | Next.js 14 (App Router), TypeScript, Tailwind CSS |
+| Frontend | Next.js 16, TypeScript, Tailwind CSS |
 | Animations | Framer Motion |
 | Icons | Lucide React |
 | Markdown | React Markdown |
-| Backend | FastAPI, Python 3.11+ |
-| AI | Google Gemini 2.0 Flash via `google-generativeai` |
+| Backend | FastAPI, Python 3.13 |
+| AI | Llama 3.3 70B via Groq API |
 | Streaming | Server-Sent Events (SSE) |
 | Runtime | Uvicorn (ASGI) |
+| Deployment | Vercel (frontend) + Render (backend) |
 
 ---
 
-## Setup
+## Running locally
 
-### 1. Get a Gemini API Key
+### Prerequisites
 
-1. Go to [aistudio.google.com](https://aistudio.google.com)
-2. Click **Get API key** → **Create API key**
-3. Copy the key
+- Python 3.11+
+- Node.js 18+
+- A free [Groq API key](https://console.groq.com)
 
-### 2. Backend
+### Backend
 
 ```bash
 cd backend
-
-# Create virtual environment
 python -m venv venv
-source venv/bin/activate   # Windows: venv\Scripts\activate
-
-# Install dependencies
+source venv/bin/activate        # Windows: venv\Scripts\activate
 pip install -r requirements.txt
-
-# Configure environment
 cp .env.example .env
-# Edit .env and paste your GEMINI_API_KEY
+# paste your GROQ_API_KEY into .env
+uvicorn main:app --reload --port 8001
 ```
 
-### 3. Frontend
+### Frontend
 
 ```bash
 cd frontend
-
-# Install dependencies
 npm install
-
-# Configure environment
 cp .env.local.example .env.local
-# .env.local already points to http://localhost:8000 — no changes needed for local dev
-```
-
----
-
-## Run Locally
-
-**Terminal 1 — Backend:**
-```bash
-cd backend
-source venv/bin/activate
-uvicorn main:app --reload --port 8000
-```
-
-**Terminal 2 — Frontend:**
-```bash
-cd frontend
+# .env.local already points to http://localhost:8001
 npm run dev
 ```
 
@@ -91,21 +74,10 @@ Open [http://localhost:3000](http://localhost:3000)
 
 ---
 
-## How it works
-
-1. **Land** — Paste any text (article, speech, claim) into the textarea
-2. **Analyze** — Click "Analyze argument" → the AI breaks it down into premises, fallacies, strong/weak points with a strength score
-3. **Fact-check** — Click "Fact-check claims with AI" to verify the main claim and premises
-4. **Debate** — Click "Debate this topic →" to enter the arena; choose your side; debate the AI with real-time streaming responses
-5. **Score** — Click "Get Score" at any point for an impartial breakdown of who won and why
-
----
-
-## Project Structure
+## Project structure
 
 ```
 debate-coach/
-├── README.md
 ├── backend/
 │   ├── main.py          # FastAPI app + all endpoints
 │   ├── models.py        # Pydantic request/response models
@@ -118,25 +90,39 @@ debate-coach/
     │   │   ├── analyze/page.tsx  # Argument analysis
     │   │   └── debate/page.tsx   # Debate arena
     │   ├── components/
-    │   │   ├── CircularProgress.tsx
-    │   │   ├── ScoreModal.tsx
-    │   │   ├── SkeletonCard.tsx
-    │   │   └── ToastContext.tsx
-    │   ├── context/
-    │   │   └── AnalysisContext.tsx
-    │   └── types/index.ts
-    ├── package.json
-    └── .env.local.example
+    │   └── context/
+    └── package.json
 ```
 
 ---
 
-## API Endpoints
+## API
 
-| Method | Path | Description |
+| Method | Endpoint | Description |
 |---|---|---|
-| POST | `/api/analyze` | Analyze an argument for structure, fallacies, and strength |
+| GET | `/health` | Health check |
+| POST | `/api/analyze` | Analyze argument structure, fallacies, and strength |
 | POST | `/api/factcheck` | Fact-check a list of claims |
-| POST | `/api/debate/start` | Start a new debate session |
-| POST | `/api/debate/respond` | Get a streaming AI rebuttal |
+| POST | `/api/debate/start` | Start a debate session |
+| POST | `/api/debate/respond` | Stream an AI rebuttal |
 | POST | `/api/debate/score` | Score the completed debate |
+
+---
+
+## Deploying your own
+
+**Backend → [Render](https://render.com)** (free tier)
+- Root directory: `backend`
+- Build: `pip install -r requirements.txt`
+- Start: `uvicorn main:app --host 0.0.0.0 --port $PORT`
+- Env vars: `GROQ_API_KEY`, `ALLOWED_ORIGINS=https://your-app.vercel.app`
+
+**Frontend → [Vercel](https://vercel.com)** (free tier)
+- Root directory: `frontend`
+- Env vars: `NEXT_PUBLIC_API_URL=https://your-render-service.onrender.com`
+
+---
+
+## License
+
+MIT
